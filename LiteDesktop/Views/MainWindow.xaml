@@ -8,6 +8,6 @@
         Title="MainWindow" Height="450" Width="800"
         Background="Transparent">
     <Grid>
-        <Image Source="../background.jpg" Stretch="UniformToFill"/>
+        <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill"/>
     </Grid>
 </Window>
