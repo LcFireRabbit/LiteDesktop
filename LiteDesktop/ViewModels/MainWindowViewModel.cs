@@ -13,11 +13,11 @@ namespace LiteDesktop.ViewModels
 {
     public class MainWindowViewModel : ObservableObject
     {
-        private string _BackgroundImage = string.Empty;
+        private Uri _BackgroundImage;
         /// <summary>
         /// 背景图片
         /// </summary>
-        public string BackgroundImage
+        public Uri BackgroundImage
         {
             get => _BackgroundImage;
             set => SetProperty(ref _BackgroundImage, value);
@@ -26,29 +26,32 @@ namespace LiteDesktop.ViewModels
 
         public MainWindowViewModel()
         {
-            GetDesktopBackgroundImage();
+            var imagePath = GetDesktopBackgroundImage();
+
+            //"C:\\Users\\LL734\\AppData\\Roaming\\Tencent\\DeskGo\\1___6130381___0___.jpg"
+            BackgroundImage = new Uri(imagePath, UriKind.RelativeOrAbsolute);
         }
 
-        
-        unsafe void GetDesktopBackgroundImage()
+
+        unsafe string GetDesktopBackgroundImage()
         {
-            FixedSizeCharStruct wallPaperPath = new FixedSizeCharStruct();
+            string path = string.Empty;
+
+            IntPtr ptr = Marshal.AllocHGlobal(200);
+
+            char* ptrChar = (char*)ptr;
+
             bool isSucc = PInvoke.SystemParametersInfo(Windows.Win32.UI.WindowsAndMessaging.SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETDESKWALLPAPER
-                    , 200
-                    , &wallPaperPath
-                    , 0);
-            BackgroundImage = BitConverter.ToString(wallPaperPath.Name);
-        }
-
-        public struct FixedSizeCharStruct
-        {
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 200)]
-            public byte[]? Name;
-
-            public FixedSizeCharStruct()
+                   , 200
+                   , ptrChar
+                   , 0);
+            if (isSucc)
             {
-
+                path = Marshal.PtrToStringUni(ptr);
             }
+            // 释放非托管内存
+            Marshal.FreeHGlobal(ptr);
+            return path;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LiteDesktop
 {
@@ -13,15 +14,22 @@ namespace LiteDesktop
         [STAThread]
         static void Main(string[] args)
         {
-            App app = new();
-            app.InitializeComponent();
-            MainWindowViewModel mainWindowViewModel = new();
-            MainWindow mainWindow = new()
+            try
             {
-                DataContext = mainWindowViewModel
-            };
-            app.MainWindow = mainWindow;
-            app.Run();
+                Application app = new();
+                MainWindowViewModel mainWindowViewModel = new();
+                MainWindow mainWindow = new()
+                {
+                    DataContext = mainWindowViewModel
+                };
+                app.Run(mainWindow);
+                app.Shutdown();
+            }
+            catch (Exception ex)
+            {
+
+            }
+            
         }
     }
 }
