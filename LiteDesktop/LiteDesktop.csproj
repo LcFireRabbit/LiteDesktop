@@ -36,4 +36,10 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Utils">
+      <HintPath>Lib\Utils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

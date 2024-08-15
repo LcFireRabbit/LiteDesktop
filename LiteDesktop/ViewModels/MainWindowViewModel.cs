@@ -25,32 +25,15 @@ namespace LiteDesktop.ViewModels
 
         public MainWindowViewModel()
         {
-            var imagePath = GetDesktopBackgroundImage();
-
-            //"C:\\Users\\LL734\\AppData\\Roaming\\Tencent\\DeskGo\\1___6130381___0___.jpg"
-            BackgroundImage = new Uri(imagePath, UriKind.RelativeOrAbsolute);
-        }
-
-
-        unsafe string GetDesktopBackgroundImage()
-        {
-            string path = string.Empty;
-
-            IntPtr ptr = Marshal.AllocHGlobal(200);
-
-            char* ptrChar = (char*)ptr;
-
-            bool isSucc = PInvoke.SystemParametersInfo(Windows.Win32.UI.WindowsAndMessaging.SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETDESKWALLPAPER
-                   , 200
-                   , ptrChar
-                   , 0);
-            if (isSucc)
+            if (Utils.WindowsApi.User32Extension.GetDesktopWallpaper(out string wallPaperPath))
             {
-                path = Marshal.PtrToStringUni(ptr);
+                BackgroundImage = new Uri(wallPaperPath, UriKind.RelativeOrAbsolute);
             }
-            // 释放非托管内存
-            Marshal.FreeHGlobal(ptr);
-            return path;
+            else
+            {
+                string defaultWallpaperPath = Environment.CurrentDirectory;
+                BackgroundImage = new Uri(defaultWallpaperPath, UriKind.RelativeOrAbsolute);
+            }
         }
     }
 }
