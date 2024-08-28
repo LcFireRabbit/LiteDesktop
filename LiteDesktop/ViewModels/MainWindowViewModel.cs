@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,7 +14,13 @@ namespace LiteDesktop.ViewModels
 {
     public class MainWindowViewModel : ObservableObject
     {
-        private Uri _BackgroundImage = new(Path.Combine(Environment.CurrentDirectory, @"Image\Background\background.jpg"), UriKind.RelativeOrAbsolute);
+        #region Fields
+        private const string _defauleBackgroundImage = @"Image\Background\background.jpg";
+        #endregion
+
+        #region Properties
+        private Uri _BackgroundImage = new(Path.Combine(Environment.CurrentDirectory, _defauleBackgroundImage)
+            , UriKind.RelativeOrAbsolute);
         /// <summary>
         /// 背景图片
         /// </summary>
@@ -22,13 +29,18 @@ namespace LiteDesktop.ViewModels
             get => _BackgroundImage;
             set => SetProperty(ref _BackgroundImage, value);
         }
-
+        #endregion
 
         public MainWindowViewModel()
         {
+            
+
             SetUserBackgroundImage();
         }
 
+        /// <summary>
+        /// 设置用户背景图片
+        /// </summary>
         private void SetUserBackgroundImage()
         {
             if (Utils.WindowsApi.User32Extension.GetDesktopWallpaper(out string wallPaperPath))

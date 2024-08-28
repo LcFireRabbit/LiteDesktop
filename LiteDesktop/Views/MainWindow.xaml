@@ -9,5 +9,6 @@
         Background="Transparent">
     <Grid>
         <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill"/>
+        
     </Grid>
 </Window>
