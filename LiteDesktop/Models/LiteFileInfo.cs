@@ -38,6 +38,12 @@ namespace LiteDesktop.Models
         }
 
         //extension
-        //
+        private string _Extension;
+
+        public string Extension
+        {
+            get => _Extension;
+            set => SetProperty(ref _Extension, value);
+        }
     }
 }

@@ -33,9 +33,11 @@ namespace LiteDesktop.ViewModels
 
         public MainWindowViewModel()
         {
-            
-
             SetUserBackgroundImage();
+
+            string customDeskPath = Utils.Helpers.AppConfigHelper.GetAppSettingsValue("DesktopPath");
+
+            var diectorys = System.IO.Directory.GetFiles(customDeskPath);
         }
 
         /// <summary>

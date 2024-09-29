@@ -8,7 +8,21 @@
         Title="MainWindow" Height="450" Width="800"
         Background="Transparent">
     <Grid>
+        <!--背景图片-->
         <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill"/>
-        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="7*"/>
+            </Grid.RowDefinitions>
+            <!--搜索框-->
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" Background="White"
+                    Height="80" Width="600" CornerRadius="40">
+                <StackPanel VerticalAlignment="Center">
+                    <!--搜索图标-->
+                    <TextBox></TextBox>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>
