@@ -38,6 +38,10 @@ namespace LiteDesktop.ViewModels
             string customDeskPath = Utils.Helpers.AppConfigHelper.GetAppSettingsValue("DesktopPath");
 
             var diectorys = System.IO.Directory.GetFiles(customDeskPath);
+            foreach (var item in diectorys)
+            {
+                var icon = SetIcon(item);
+            }
         }
 
         /// <summary>
@@ -50,5 +54,16 @@ namespace LiteDesktop.ViewModels
                 _BackgroundImage = new Uri(wallPaperPath, UriKind.RelativeOrAbsolute);
             }
         }
+
+        [DllImport("shell32.DLL", EntryPoint = "ExtractAssociatedIcon")]
+        private static extern int ExtractAssociatedIconA(int hInst, string lpIconPath, ref int lpiIcon); //声明函数
+        System.IntPtr thisHandle;
+        public System.Drawing.Icon SetIcon(string path)
+        {
+            int RefInt = 0;
+            thisHandle = new IntPtr(ExtractAssociatedIconA(0, path, ref RefInt));
+            return System.Drawing.Icon.FromHandle(thisHandle);
+        }
+
     }
 }

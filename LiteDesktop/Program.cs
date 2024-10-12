@@ -17,6 +17,7 @@ namespace LiteDesktop
             try
             {
                 Application app = new();
+                AppInitializer.Initialize(app);
                 MainWindowViewModel mainWindowViewModel = new();
                 MainWindow mainWindow = new()
                 {

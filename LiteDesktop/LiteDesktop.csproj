@@ -10,6 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Config\**" />
+    <EmbeddedResource Remove="Config\**" />
+    <None Remove="Config\**" />
+    <Page Remove="Config\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="background.jpg" />
     <None Remove="Lib\Utils.dll" />
     <None Remove="Lib\WindowsApi\Lib\Interop.RDPCOMAPILib.dll" />
@@ -29,11 +36,11 @@
 
   <ItemGroup>
     <Folder Include="Plan\" />
-    <Folder Include="Config\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0-rc.2.24474.1" />
   </ItemGroup>
 
   <ItemGroup>
