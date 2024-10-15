@@ -11,24 +11,5 @@
         <!--背景图片-->
         <Image Source="{Binding BackgroundImage}" Stretch="UniformToFill"/>
         <!--图标列表-->
-        <Canvas Name="myGrid" AllowDrop="True"  Background="Transparent" Drop="myGrid_Drop" PreviewDragOver="myGrid_DragOver">
-            <Button PreviewMouseLeftButtonDown="Button_MouseLeftButtonDown" AllowDrop="True" Height="39.127" Canvas.Left="37.422" Canvas.Top="30.084" Width="61.774">
-                <Button.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#FFF7F5F5" Offset="0"/>
-                        <GradientStop Color="#FF319744" Offset="1"/>
-                    </LinearGradientBrush>
-                </Button.Background> hello
-            </Button>
-            <Button PreviewMouseLeftButtonDown="Button_MouseLeftButtonDown" AllowDrop="True" Height="39.127" Canvas.Left="37.422" Canvas.Top="30.084" Width="61.774">
-                <Button.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="#FFF7F5F5" Offset="0"/>
-                        <GradientStop Color="#FF319744" Offset="1"/>
-                    </LinearGradientBrush>
-                </Button.Background> hello
-            </Button>
-            <Rectangle x:Name="rt"></Rectangle>
-        </Canvas>
     </Grid>
 </Window>
