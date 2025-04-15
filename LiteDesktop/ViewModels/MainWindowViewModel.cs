@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using static Utils.WindowsApi.Shell32Base;
 
 namespace LiteDesktop.ViewModels
 {
@@ -64,9 +65,17 @@ namespace LiteDesktop.ViewModels
 
         private void GetLiteFileInfos()
         {
-            string customDeskPath = Utils.Helpers.AppConfigHelper.GetAppSettingsValue(_desktopPathKey);
+            LiteFileInfos = GetLiteFileInfosByPath(GetCustomDeskPath());
+        }
 
-            LiteFileInfos = GetLiteFileInfosByPath(customDeskPath);
+        private string GetCustomDeskPath()
+        {
+            string customDeskPath = Utils.Helpers.AppConfigHelper.GetAppSettingsValue(_desktopPathKey);
+            if (string.IsNullOrEmpty(customDeskPath) || !Directory.Exists(customDeskPath))
+            {
+                customDeskPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            }
+            return customDeskPath;
         }
 
         private List<LiteFileInfo> GetLiteFileInfosByPath(string orderPath)
@@ -88,9 +97,12 @@ namespace LiteDesktop.ViewModels
         private LiteFileInfo GetLiteFileInfo(string path)
         {
             FileInfo fileInfo = new(path);
+
+            var icon = System.Drawing.Icon.ExtractAssociatedIcon(path);
+
             return new LiteFileInfo()
             {
-                Icon = GetIconFromFilePath(path),
+                Icon = ConvertIconToImageSource(GetFileIcon(path)),
                 FilePath = path,
                 Name = fileInfo.Name,
                 Extension = fileInfo.Extension,
@@ -98,42 +110,83 @@ namespace LiteDesktop.ViewModels
             };
         }
 
-        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
-        private static extern IntPtr ExtractIcon(IntPtr hInst, string lpIconFile, int nIconIndex);
+        // 定义结构体
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SHFILEINFO
+        {
+            public IntPtr hIcon;
+            public int iIcon;
+            public uint dwAttributes;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            public string szDisplayName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
+            public string szTypeName;
+        }
 
+        // 声明API函数
+        [DllImport("shell32.dll")]
+        private static extern IntPtr SHGetFileInfo(
+            string pszPath,
+            uint dwFileAttributes,
+            ref SHFILEINFO psfi,
+            uint cbSizeFileInfo,
+            uint uFlags);
+
+        // 调用 Win32 API 释放 HICON
         [DllImport("user32.dll")]
-        private static extern bool DestroyIcon(IntPtr hIcon);
+        private static extern bool DestroyIcon(IntPtr handle);
 
-        public static BitmapSource GetIconFromFilePath(string filePath)
+        // 标志位定义
+        private const uint SHGFI_ICON = 0x100;
+        private const uint SHGFI_LARGEICON = 0x0;    // 大图标（32x32）
+        private const uint SHGFI_SMALLICON = 0x1;    // 小图标（16x16）
+        private const uint SHGFI_SYSICONINDEX = 0x4000; // 系统图标索引
+
+        public static Icon GetFileIcon(string filePath, bool isLargeIcon = true)
         {
-            // 从文件路径获取图标
-            return GetIcon(filePath, 0);
+            if (!File.Exists(filePath) && !Directory.Exists(filePath))
+                throw new FileNotFoundException("文件或文件夹不存在。");
+
+            SHFILEINFO shinfo = new SHFILEINFO();
+            uint flags = SHGFI_ICON | (isLargeIcon ? SHGFI_LARGEICON : SHGFI_SMALLICON);
+
+            IntPtr handle = SHGetFileInfo(
+                filePath,
+                0,
+                ref shinfo,
+                (uint)Marshal.SizeOf(shinfo),
+                flags);
+
+            if (handle != IntPtr.Zero)
+            {
+                return Icon.FromHandle(shinfo.hIcon);
+            }
+            return null;
         }
 
-        public static BitmapSource GetIconFromFileExtension(string fileExtension)
+        public ImageSource ConvertIconToImageSource(Icon icon)
         {
-            // 从文件扩展名获取图标
-            return GetIcon(fileExtension, -1);
-        }
+            if (icon == null)
+                return null;
 
-        private static BitmapSource GetIcon(string path, int index)
-        {
-            IntPtr hIcon = ExtractIcon(IntPtr.Zero, path, index);
+            // 获取图标句柄（HICON）
+            IntPtr hicon = icon.Handle;
 
-            if (hIcon == IntPtr.Zero)
-            {
-                throw new Exception("无法提取图标");
-            }
+            // 创建 BitmapSource
+            var bitmap = Imaging.CreateBitmapSourceFromHIcon(
+                hicon,
+                new Int32Rect(0, 0, icon.Width, icon.Height), // 源矩形（整个图标）
+                BitmapSizeOptions.FromEmptyOptions() // 或其他选项
+            );
 
-            try
-            {
-                using Icon icon = Icon.FromHandle(hIcon);
-                return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty,BitmapSizeOptions.FromEmptyOptions());
-            }
-            finally
-            {
-                DestroyIcon(hIcon);
-            }
+            // 冻结对象以优化性能（可选）
+            if (bitmap != null)
+                bitmap.Freeze();
+
+            // 释放 HICON 资源（重要！）
+            DestroyIcon(hicon);
+
+            return bitmap;
         }
     }
 }

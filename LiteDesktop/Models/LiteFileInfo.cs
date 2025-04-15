@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace LiteDesktop.Models
@@ -12,9 +13,9 @@ namespace LiteDesktop.Models
     public class LiteFileInfo : ObservableObject
     {
         //icon
-        private BitmapSource? _Icon;
+        private ImageSource? _Icon;
 
-        public BitmapSource? Icon
+        public ImageSource? Icon
         {
             get => _Icon;
             set => SetProperty(ref _Icon, value);
